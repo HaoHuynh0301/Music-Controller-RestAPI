@@ -13,3 +13,5 @@ from django.conf import settings
 class RoomView(generics.CreateAPIView):
     queryset = models.Room.objects.all()
     serializer_class = serializers.RoomSerializer
+    
+
