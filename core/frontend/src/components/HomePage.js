@@ -9,6 +9,7 @@ import { BrowserRouter as Router,
 from "react-router-dom";
 
 export default class HomePage extends Component {
+    defaultVotes = 2
     constructor(props) {
         super(props);
     }

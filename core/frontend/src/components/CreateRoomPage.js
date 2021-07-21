@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import Button from "@material-ui/core/Button";
 import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -13,16 +14,93 @@ export default class CreateRoomPage extends Component {
     defaultVotes = 2
     constructor(props) {
         super(props);
+        this.state = {
+            guestCanPause: true,
+            votesToSkip: this.defaultVotes
+        }
+        this.handleRoomButtonPress = this.handleRoomButtonPress.bind(this);
+    }
+
+    handleVotesChanged() {
+        this.setState({
+            votesToSkip: e.target.value,
+        });
+    }
+
+    handleGuestCanPauseChange() {
+        this.setState({
+            guestCanPause: e.target.value == "true" ? true : false,
+        });
+    }
+
+    handleRoomButtonPress() {
+
     }
 
     render() {
         return (
            <Grid container spacing={1}>
-               <Grid item xs={12} align="center">
-                    <Typography component="h4" variant="h4">
+                <Grid item xs={12} align="center">
+                        <Typography component="h4" variant="h4">
+                            Create A Room
+                        </Typography>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <FormControl component="fieldset">
+                        <FormHelperText>
+                            <div align="center">Guest Control of Playback State</div>
+                        </FormHelperText>
+                        <RadioGroup
+                            row
+                            defaultValue="true"
+                            onChange={this.handleGuestCanPauseChange}
+                        >
+                            <FormControlLabel
+                                value="true"
+                                control={<Radio color="primary" />}
+                                label="Play/Pause"
+                                labelPlacement="bottom"
+                            />
+                            <FormControlLabel
+                                value="false"
+                                control={<Radio color="secondary" />}
+                                label="No Control"
+                                labelPlacement="bottom"
+                            />
+                        </RadioGroup>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <FormControl>
+                        <TextField required="true"
+                            type="number"
+                            defaultValue={this.defaultVotes}
+                            inputPro={{
+                                min: 1,
+                                style: {
+                                    textAlign: "center" 
+                                }
+                            }}
+                            onChange={this.handleVotesChanged}
+                        />
+                        <FormHelperText>
+                            <div align="center">Votes required to skip</div>
+                        </FormHelperText>
+                    </FormControl>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <Button
+                        color="primary"
+                        variant="contained"
+                    >
                         Create A Room
-                    </Typography>
-               </Grid>
+                    </Button>
+                </Grid>
+                <Grid item xs={12} align="center">
+                    <Button color="secondary" variant="contained" to="/" component={Link}>
+                        Back
+                    </Button>
+                </Grid>
            </Grid>
         )
     }
