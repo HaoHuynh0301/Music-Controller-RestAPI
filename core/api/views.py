@@ -33,6 +33,7 @@ class CreateRoomView(APIView):
                 room.guest_can_pause = guest_can_pause
                 room.votes_to_skip = votes_to_skip
                 room.save(update_fields = ['guest_can_pause', 'votes_to_skip'])
+                return Response(serializers.RoomSerializer(room).data, status=status.HTTP_200_OK)
             else:
                 room = models.Room.objects.create(host = host, guest_can_pause = guest_can_pause, votes_to_skip = votes_to_skip)
             return Response(serializers.RoomSerializer(room).data, status = status.HTTP_201_CREATED)

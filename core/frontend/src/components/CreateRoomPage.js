@@ -19,22 +19,34 @@ export default class CreateRoomPage extends Component {
             votesToSkip: this.defaultVotes
         }
         this.handleRoomButtonPress = this.handleRoomButtonPress.bind(this);
+        this.handleVotesChanged = this.handleVotesChanged.bind(this);
+        this.handleGuestCanPauseChange = this.handleGuestCanPauseChange.bind(this);
     }
 
-    handleVotesChanged() {
+    handleVotesChanged(e) {
         this.setState({
             votesToSkip: e.target.value,
         });
     }
 
-    handleGuestCanPauseChange() {
+    handleGuestCanPauseChange(e) {
         this.setState({
             guestCanPause: e.target.value == "true" ? true : false,
         });
     }
 
     handleRoomButtonPress() {
-
+        const requestOption = {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({
+                votes_to_skip: this.state.votesToSkip,
+                guest_can_pause: this.state.guestCanPause,
+            }),
+        };
+        fetch("/api/create-room/", requestOption)
+            .then((response) => response.json())
+            .then((data) => console.log(data));
     }
 
     render() {
@@ -92,6 +104,7 @@ export default class CreateRoomPage extends Component {
                     <Button
                         color="primary"
                         variant="contained"
+                        onClick={this.handleRoomButtonPress}
                     >
                         Create A Room
                     </Button>
