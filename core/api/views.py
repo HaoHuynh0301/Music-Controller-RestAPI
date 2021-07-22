@@ -11,9 +11,11 @@ from django.core.mail import EmailMessage
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
 
-class RoomView(generics.CreateAPIView):
-    queryset = models.Room.objects.all()
+
+class RoomsView(generics.ListAPIView):
     serializer_class = serializers.RoomSerializer
+    permission_classes = [permissions.AllowAny]
+    queryset = models.Room.objects.all()
     
     
 class CreateRoomView(APIView):
@@ -40,5 +42,21 @@ class CreateRoomView(APIView):
                 room = models.Room.objects.create(host = host, guest_can_pause = guest_can_pause, votes_to_skip = votes_to_skip)
             return Response(serializers.RoomSerializer(room).data, status = status.HTTP_201_CREATED)
         return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
-
+    
+    
+class DetailRoomView(APIView):
+    serializer_class = serializers.RoomSerializer
+    permission_classes = [permissions.AllowAny]
+    lookup_url_kwarg = 'code'
+    
+    def get(self, request, format = None):
+        code = request.GET.get(self.lookup_url_kwarg)
+        if code != None:
+            room = models.Room.objects.filter(code = code)
+            if len(room) > 0:
+                data = self.serializer_class(room[0]).data
+                data['is_host'] = self.request.session.session_key == room[0].code
+                return Response(data, status = status.HTTP_200_OK)
+            return Response('Room code is not exist!', status = status.HTTP_404_NOT_FOUND)
+        return Response('Parameters are invalid', status = status.HTTP_400_BAD_REQUEST)
 
