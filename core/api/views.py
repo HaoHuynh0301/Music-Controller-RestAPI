@@ -9,6 +9,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import EmailMessage
 from django.conf import settings
+from django.views.decorators.csrf import ensure_csrf_cookie
 
 class RoomView(generics.CreateAPIView):
     queryset = models.Room.objects.all()
@@ -17,6 +18,7 @@ class RoomView(generics.CreateAPIView):
     
 class CreateRoomView(APIView):
     serializer_class = serializers.CreateRoomSerializer
+    permission_classes = [permissions.AllowAny]
     
     def post(self, request, format = None):
         if not self.request.session.exists(self.request.session.session_key):
