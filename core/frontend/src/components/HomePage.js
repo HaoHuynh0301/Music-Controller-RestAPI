@@ -10,7 +10,6 @@ import { BrowserRouter as Router,
 from "react-router-dom";
 
 export default class HomePage extends Component {
-    defaultVotes = 2
     constructor(props) {
         super(props);
     }
@@ -19,9 +18,9 @@ export default class HomePage extends Component {
         return (
             <Router>
                 <Switch>
-                    <Route exact path="/">This is a HomePage</Route>
+                    <Route exact path="/">This is a HomePage hello</Route>
                     <Route path="/join" component={RoomJoinPage}></Route>
-                    <Route path="/create" s={CreateRoomPage}></Route>
+                    <Route path="/create" component={CreateRoomPage}/>
                     <Route path="/room/:roomCode" component={Room}></Route>
                 </Switch>
             </Router>

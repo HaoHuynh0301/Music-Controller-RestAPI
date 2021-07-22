@@ -56,6 +56,7 @@ class DetailRoomView(APIView):
             if len(room) > 0:
                 data = self.serializer_class(room[0]).data
                 data['is_host'] = self.request.session.session_key == room[0].code
+                print(data)
                 return Response(data, status = status.HTTP_200_OK)
             return Response('Room code is not exist!', status = status.HTTP_404_NOT_FOUND)
         return Response('Parameters are invalid', status = status.HTTP_400_BAD_REQUEST)

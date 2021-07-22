@@ -13,16 +13,19 @@ export default class Room extends Component {
     }
 
     getRoomDetail() {
-        fetch("api/get-room" + "?code=" + this.roomCode)
+        fetch("/api/get-room" + "?code=" + this.roomCode)
             .then((response) => response.json())
             .then((data)=> {
-                console.log(data);
+                console.log(data)
                 this.setState({
-                    votesToSkip: data.votesToSkip,
-                    guestCanPause: data.guestCanPause,
+                    votesToSkip: data.votes_to_skip,
+                    guestCanPause: data.guest_can_pause,
                     isHost: data.is_host
                 });
-        });
+            })
+            .catch((err) => {
+                console.log("Error" + err.toString());
+            })
     }
 
     render() {
