@@ -7,5 +7,6 @@ urlpatterns = [
     path('create-room/', views.CreateRoomView.as_view(), name = 'create-room'),
     path('get-room/', views.DetailRoomView.as_view(), name = 'room-detail'),
     path('join-room/', views.JoinRoomView.as_view(), name = 'join-room'),
-    path('user-in-room/', views.UserInRoomView.as_view(), name = 'user-in-room')
+    path('user-in-room/', views.UserInRoomView.as_view(), name = 'user-in-room'),
+    path('leave-room/', views.LeaveRoomView.as_view(), name = 'leave-room')
 ]
