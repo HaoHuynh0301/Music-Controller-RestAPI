@@ -10,6 +10,7 @@ from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.core.mail import EmailMessage
 from django.conf import settings
 from django.views.decorators.csrf import ensure_csrf_cookie
+from django.http import JsonResponse
 
 
 class RoomsView(generics.ListAPIView):
@@ -32,7 +33,7 @@ class CreateRoomView(APIView):
             votes_to_skip= serializer.validated_data['votes_to_skip']
             host = self.request.session.session_key
             query = models.Room.objects.filter(host = host)
-            if query.exists():
+            if len(query) > 0:
                 room = query[0]
                 room.guest_can_pause = guest_can_pause
                 room.votes_to_skip = votes_to_skip
@@ -82,4 +83,15 @@ class DetailRoomView(APIView):
                 return Response(data, status = status.HTTP_200_OK)
             return Response('Room code is not exist!', status = status.HTTP_404_NOT_FOUND)
         return Response('Parameters are invalid', status = status.HTTP_400_BAD_REQUEST)
+    
+    
+class UserInRoomView(APIView):
+    def get(self, request, format = None):
+        print('OK')
+        if not self.request.session.exists(self.request.session.session_key):
+            self.request.session.create()
+        data = {
+            'code': self.request.session.get('room_code')
+        }
+        return JsonResponse(data, status = status.HTTP_200_OK)
 
