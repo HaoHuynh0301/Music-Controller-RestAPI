@@ -53,6 +53,7 @@ class JoinRoomView(APIView):
             self.request.session.create()
 
         code = request.data.get(self.lookup_url_kwarg)
+        code = str(code)
         if code != None:
             room_result = models.Room.objects.filter(code=code)
             if len(room_result) > 0:

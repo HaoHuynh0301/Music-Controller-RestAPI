@@ -17,56 +17,61 @@ export default class RoomJoinPage extends Component {
             roomCode: "",
             error: ""
         }
-        this.handleTextFieldChange = this.handleTextFieldChange.bind(this);
+        this._handleTextFieldChange = this._handleTextFieldChange.bind(this);
         this.roomButtonRequest = this.roomButtonRequest.bind(this);
     }
 
-    handleTextFieldChange(e) {
+    _handleTextFieldChange(e) {
+        console.log(e.target.value)
         this.setState({
-            room: e.target.value
+            roomCode: e.target.value
         });
     }
 
     roomButtonRequest() {
         const requestOption = {
             method: "POST",
-            header: {"Content-Type": "application/json"},
+            headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                code: this.state.roomCode
+                code: this.state.roomCode,
             }),
         };
-        fetch("/api/join-room", requestOption)
+        // console.log(this.RequestOption);
+        fetch("http://127.0.0.1:5500/api/join-room/", requestOption)
             .then((response) => {
                 if(response.ok) {
                     this.props.history.push(`/room/${this.state.roomCode}`);
-                } 
-                this.setState({
-                    error: "Room code is invalid!"
-                });
+                    console.log("OK")
+                } else {
+                    this.setState({
+                        error: "Room not found."
+                    });
+                }
             })
             .catch((error) => {
                 console.log(error)
-            })
+            });
     }
     
     render() {
         return (
             <Grid container spacing={1}>
                 <Grid item xs={12} align="center">
-                <Typography variant="h4" component="h4">
-                    Join a Room
-                </Typography>
+                    <Typography variant="h4" component="h4">
+                        Join a Room
+                    </Typography>
                 </Grid>
                 <Grid item xs={12} align="center">
-                <TextField
-                    error={this.state.error}
-                    label="Code"
-                    placeholder="Enter a Room Code"
-                    value={this.state.roomCode}
-                    helperText={this.state.error}
-                    variant="outlined"
-                    onChange={this.handleTextFieldChange}
-                />
+                    <TextField
+                        value={this.state.roomCode}
+                        error={this.state.error}
+                        label="Code"
+                        placeholder="Enter a Room Code"
+                        value={this.state.roomCode}
+                        helperText={this.state.error}
+                        variant="outlined"
+                        onChange={this._handleTextFieldChange}
+                    />
                 </Grid>
                 <Grid item xs={12} align="center">
                 <Button
