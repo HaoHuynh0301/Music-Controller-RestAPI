@@ -25,29 +25,34 @@ export default class Room extends Component {
         this.updateShowSettings = this.updateShowSettings.bind(this);
         this.renderSettings =  this.renderSettings.bind(this);
         this.renderSettingsButton = this.renderSettingsButton.bind(this);
+        this.getRoomDetail = this.getRoomDetail.bind(this);
         this.getRoomDetail();
     }
 
     getRoomDetail() {
-        fetch("/api/get-room" + "?code=" + this.roomCode)
-            .then((response) => {
-                if(!response.ok) {
-                    this.props.leaveRoomCallback();
-                    this.props.history.push("/");
-                }
-                return response.json();
-            })
-            .then((data)=> {
-                console.log(data)
-                this.setState({
-                    votesToSkip: data.votes_to_skip,
-                    guestCanPause: data.guest_can_pause,
-                    isHost: data.is_host
-                });
-            })
-            .catch((err) => {
-                console.log("Error" + err.toString());
-            })
+        return(
+            fetch("/api/get-room" + "?code=" + this.roomCode)
+                .then((response) => {
+                    if(!response.ok) {
+                        this.props.leaveRoomCallback();
+                        this.props.history.push("/");
+                    }
+                    console.log("Fetch success!");
+                    return response.json();
+                })
+                .then((data)=> {
+                    console.log(data)
+                    this.setState({
+                        votesToSkip: data.votes_to_skip,
+                        guestCanPause: data.guest_can_pause,
+                        isHost: data.is_host
+                    });
+                })
+                .catch((err) => {
+                    console.log("Error" + err.toString());
+                })
+        );
+
     }
 
     leaveRoomButtonPressed() {
@@ -120,7 +125,7 @@ export default class Room extends Component {
             <Grid container spacing={1}>
                 <Grid item xs={12} align="center">
                     <Typography variant="h4" component="h4">
-                        Code: {this.state.roomCode}
+                        Code: {this.roomCode}
                     </Typography>
                 </Grid>
                 <Grid item xs={12} align="center">
