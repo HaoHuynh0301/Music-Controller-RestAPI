@@ -32,24 +32,25 @@ export default class Room extends Component {
     }
 
     authenticateSpotify() {
-        fetch('/spotify/is_authenticated/')
+        fetch('/spotify/is-authenticated')
             .then((response) => response.json())
             .then((data) => {
-                console.log("spotify");
                 this.setState({
                     spotifyAuthenticated: data.status
                 });
-                if(!data.status) {
+                console.log("1");
+                if(data.status) {
                     fetch('/spotify/get-auth-url')
                         .then((response) => response.json())
                         .then((data) => {
+                            console.log(data.url);
                             window.location.replace(data.url);
-                        })
+                        });
                 }
             })
             .catch((err) => {
                 console.log("Spotify error" + err);
-            })
+            });
     }
 
     getRoomDetail() {
@@ -60,7 +61,6 @@ export default class Room extends Component {
                         this.props.leaveRoomCallback();
                         this.props.history.push("/");
                     }
-                    console.log("Fetch");
                     return response.json();
                 })
                 .then((data)=> {
@@ -70,7 +70,6 @@ export default class Room extends Component {
                         isHost: data.is_host
                     });
                     if(this.state.isHost) {
-                        console.log("ne")
                         this.authenticateSpotify();
                     }
                 })

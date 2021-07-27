@@ -5,11 +5,12 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from requests import Request, post
+from . import models
 
 class AuthURLView(APIView):
     def get(self, request, format = None):
         scopes = 'user-read-playback-state user-modify-playback-state user-read-currently-playing'
-        url = Request('GET', 'https://accounts.spotify.com/authorize', parama = {
+        url = Request('GET', 'https://accounts.spotify.com/authorize', params = {
             'scope': scopes,
             'response_type': 'code',
             'redirect_uri': REDIRECT_URI,
@@ -18,10 +19,19 @@ class AuthURLView(APIView):
         return Response({'url': url}, status = status.HTTP_200_OK)
     
     
+class CurrentSongView(APIView):
+    def get(self, request, format = None):
+        roomCode = self.request.session.get('room_code')
+        room = models.Room.objects.filter(code = roomCode)[0]
+        host = room.host
+        endPoint = '/player/currently-playing'
+        
+    
 class IsAuthenticatedClass(APIView):
     def get(self, request, format = None):
         IsAuthenticated = is_spotify_authenticated(self.request.session.session_key)
         return Response({'status': 'isAuthenticated'}, status = status.HTTP_200_OK)
+    
             
 def spotify_callback(request, format = None):
     code = request.GET.get('code')

@@ -59,6 +59,7 @@ export default class CreateRoomPage extends Component {
         fetch("/api/create-room/", requestOption)
             .then((response) => response.json())
             .then((data) => {
+                console.log("Create new room successfully !");
                 this.props.history.push(`/room/${data.code}`);
             })
             .catch((err) => {
