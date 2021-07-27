@@ -19,6 +19,7 @@ export default class Room extends Component {
             guestCanPause: false,
             isHost: false,
             showSettings: false,
+            spotifyAuthenticated: false,
         };
         this.roomCode = this.props.match.params.roomCode;
         this.leaveRoomButtonPressed = this.leaveRoomButtonPressed.bind(this);
@@ -26,7 +27,29 @@ export default class Room extends Component {
         this.renderSettings =  this.renderSettings.bind(this);
         this.renderSettingsButton = this.renderSettingsButton.bind(this);
         this.getRoomDetail = this.getRoomDetail.bind(this);
+        this.authenticateSpotify = this.authenticateSpotify.bind(this);
         this.getRoomDetail();
+    }
+
+    authenticateSpotify() {
+        fetch('/spotify/is_authenticated/')
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("spotify");
+                this.setState({
+                    spotifyAuthenticated: data.status
+                });
+                if(!data.status) {
+                    fetch('/spotify/get-auth-url')
+                        .then((response) => response.json())
+                        .then((data) => {
+                            window.location.replace(data.url);
+                        })
+                }
+            })
+            .catch((err) => {
+                console.log("Spotify error" + err);
+            })
     }
 
     getRoomDetail() {
@@ -37,16 +60,19 @@ export default class Room extends Component {
                         this.props.leaveRoomCallback();
                         this.props.history.push("/");
                     }
-                    console.log("Fetch success!");
+                    console.log("Fetch");
                     return response.json();
                 })
                 .then((data)=> {
-                    console.log(data)
                     this.setState({
                         votesToSkip: data.votes_to_skip,
                         guestCanPause: data.guest_can_pause,
                         isHost: data.is_host
                     });
+                    if(this.state.isHost) {
+                        console.log("ne")
+                        this.authenticateSpotify();
+                    }
                 })
                 .catch((err) => {
                     console.log("Error" + err.toString());
@@ -75,6 +101,7 @@ export default class Room extends Component {
         });
     }
 
+
     renderSettings() {
         return(
             <Grid container spacing={1}>
@@ -84,9 +111,7 @@ export default class Room extends Component {
                         votesToSkip={this.state.votesToSkip}
                         guestCanPause={this.state.guestCanPause}
                         roomCode={this.roomCode}
-                        updateCallback={() => {
-                            this.getRoomDetail
-                        }}
+                        updateCallback={this.getRoomDetail}
                     />
                 </Grid>
                 <Grid item xs={12} align="center">

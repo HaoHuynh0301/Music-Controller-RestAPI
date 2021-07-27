@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from .credentials import REDIRECT_URI, CLIENT_SECRET, CLIENT_ID
-from .utils import update_or_create_user_tokens
+from .utils import update_or_create_user_tokens, is_spotify_authenticated
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -17,6 +17,12 @@ class AuthURLView(APIView):
         }).prepare().url
         return Response({'url': url}, status = status.HTTP_200_OK)
     
+    
+class IsAuthenticatedClass(APIView):
+    def get(self, request, format = None):
+        IsAuthenticated = is_spotify_authenticated(self.request.session.session_key)
+        return Response({'status': 'isAuthenticated'}, status = status.HTTP_200_OK)
+            
 def spotify_callback(request, format = None):
     code = request.GET.get('code')
     error = request.GET.get('error')
