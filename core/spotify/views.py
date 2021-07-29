@@ -1,11 +1,11 @@
 from django.shortcuts import render, redirect
 from .credentials import REDIRECT_URI, CLIENT_SECRET, CLIENT_ID
-from .utils import update_or_create_user_tokens, is_spotify_authenticated
+from .utils import update_or_create_user_tokens, is_spotify_authenticated, execute_spotify_api_request
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from requests import Request, post
-from . import models
+from api import models
 
 class AuthURLView(APIView):
     def get(self, request, format = None):
@@ -22,9 +22,45 @@ class AuthURLView(APIView):
 class CurrentSongView(APIView):
     def get(self, request, format = None):
         roomCode = self.request.session.get('room_code')
-        room = models.Room.objects.filter(code = roomCode)[0]
+        room = models.Room.objects.filter(code = roomCode)
+        if len(room) > 0:
+            room = room[0]
+        else:
+            return Response({}, status = status.HTTP_404_NOT_FOUND)
         host = room.host
-        endPoint = '/player/currently-playing'
+        endPoint = 'player/currently-playing'
+        response = execute_spotify_api_request(host, endPoint)
+        
+        if 'error' in response or 'item' not in response:
+            return Response({}, status=status.HTTP_204_NO_CONTENT)
+
+        item = response.get('item')
+        duration = item.get('duration_ms')
+        progress = response.get('progress_ms')
+        album_cover = item.get('album').get('images')[0].get('url')
+        is_playing = response.get('is_playing')
+        song_id = item.get('id')
+
+        artist_string = ""
+
+        for i, artist in enumerate(item.get('artists')):
+            if i > 0:
+                artist_string += ", "
+            name = artist.get('name')
+            artist_string += name
+
+        song = {
+            'title': item.get('name'),
+            'artist': artist_string,
+            'duration': duration,
+            'time': progress,
+            'image_url': album_cover,
+            'is_playing': is_playing,
+            'votes': 0,
+            'id': song_id
+        }
+
+        return Response(song, status=status.HTTP_200_OK)
         
     
 class IsAuthenticatedClass(APIView):

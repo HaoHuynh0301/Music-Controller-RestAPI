@@ -12,15 +12,17 @@ def get_user_token(session_id):
         return userToken[0]
     return None
 
-def update_or_create_user_tokens(session_id, access_token, expires_in, refresh_token, token_type):
+def update_or_create_user_tokens(session_id, access_token, token_type, expires_in, refresh_token):
     tokens = get_user_token(session_id)
-    expires_in = timezone.now() + timedelta(seconds = expires_in)
+    expires_in = timezone.now() + timedelta(seconds=expires_in)
+    
     if tokens:
         tokens.access_token = access_token
         tokens.refresh_token = refresh_token
         tokens.expires_in = expires_in
         tokens.token_type = token_type
-        tokens.save()
+        tokens.save(update_fields=['access_token',
+                                   'refresh_token', 'expires_in', 'token_type'])
     else:
         tokens = models.SpotifyToken(user = session_id, access_token = access_token, 
                                      refresh_token = refresh_token, expires_in = expires_in, 
@@ -62,6 +64,10 @@ def execute_spotify_api_request(session_id, endpoint, post_ = False, put_ = Fals
     if put_:
         put(BASE_URL + endpoint, headers = headers)
     response = get(BASE_URL + endpoint, {}, headers = headers)
+    try:
+        return response.json()
+    except:
+        return {'error': 'Issue with request'}
             
     
     
